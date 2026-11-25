@@ -28,6 +28,10 @@ public class TelegramDigestServiceImpl implements TelegramDigestService {
         List<Article> articles = articleRepository.findAllByStatusOrderByRelevanceScoreDesc(ArticleStatus.SUMMARIZED);
 
         if (articles.isEmpty()) {
+            String today = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            String fallbackMessage = "<b>DAILY TECH DIGEST — " + today + "</b>\n\n"
+                    + "No new high-signal engineering articles were published across your sources today. Enjoy a quiet morning!";
+            sendMessage(fallbackMessage);
             log.info("No summarized articles available to send today.");
             return;
         }

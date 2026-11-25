@@ -32,8 +32,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Copy latest docker-compose.yml to app folder
-        run: cp ${{ github.workspace }}/docker-compose.yml ~/apps/tech-digest/docker-compose.yml
+      - name: Copy latest docker-compose.yaml to app folder
+      - run: cp ${{ github.workspace }}/docker-compose.yaml ~/apps/tech-digest/docker-compose.yml
 
       - name: Pull image and restart container
         working-directory: ~/apps/tech-digest

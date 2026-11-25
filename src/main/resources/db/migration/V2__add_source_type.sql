@@ -1,0 +1,2 @@
+ALTER TABLE feed_sources
+    ADD COLUMN source_type VARCHAR(50) NOT NULL DEFAULT 'RSS';

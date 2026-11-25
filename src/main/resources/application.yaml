@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: TechBlogSuggestion
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/tech_digest}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  threads:
+    virtual:
+      enabled: true
+
+gemini:
+  api:
+    key: ${GEMINI_API_KEY:}
+    base-url: https://generativelanguage.googleapis.com/v1beta
+    chat-model: gemini-3.5-flash-lite
+    embedding-model: gemini-embedding-001
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:}
+    chat-id: ${TELEGRAM_CHAT_ID:}

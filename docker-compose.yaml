@@ -1,0 +1,60 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: tech-digest-db
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 350M
+    command: >
+      postgres
+      -c shared_buffers=64MB
+      -c work_mem=4MB
+      -c max_connections=20
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: tech-digest-redis
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    command: redis-server --maxmemory 48mb --maxmemory-policy allkeys-lru
+
+  app:
+    image: ${DOCKERHUB_USERNAME}/tech-blog-suggestion:latest
+    container_name: tech-digest-app
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 450M
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID}
+      TZ: Asia/Ho_Chi_Minh
+
+volumes:
+  pgdata:

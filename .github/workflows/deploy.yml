@@ -29,6 +29,9 @@ jobs:
     needs: build-and-push
     runs-on: self-hosted
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Copy latest docker-compose.yml to app folder
         run: cp ${{ github.workspace }}/docker-compose.yml ~/apps/tech-digest/docker-compose.yml
 

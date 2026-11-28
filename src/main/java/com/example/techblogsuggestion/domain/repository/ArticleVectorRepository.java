@@ -21,24 +21,6 @@ public class ArticleVectorRepository {
                 .update();
     }
 
-    public Optional<Double> findMaxSimilarityInLast48Hours(Long excludeArticleId, float[] targetVector) {
-        String vectorLiteral = formatVector(targetVector);
-        String sql = """
-                SELECT MAX(1 - (embedding <=> CAST(:vec AS vector)))
-                FROM articles
-                WHERE id != :excludeId
-                  AND embedding IS NOT NULL
-                  AND status != 'DUPLICATE'
-                  AND created_at > NOW() - INTERVAL '48 hours'
-                """;
-
-        return jdbcClient.sql(sql)
-                .param("vec", vectorLiteral)
-                .param("excludeId", excludeArticleId)
-                .query(Double.class)
-                .optional();
-    }
-
     private String formatVector(float[] vector) {
         return Arrays.toString(vector).replace(" ", "");
     }

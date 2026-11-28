@@ -80,19 +80,12 @@ public class ArticleCurationServiceImpl implements ArticleCurationService {
         for (Article article : rawArticles) {
             try {
                 double maxSim;
-                if (vectorRepository.hasEmbedding(article.getId())) {
-                    maxSim = vectorRepository
-                            .findMaxSimilarityByExistingEmbedding(article.getId())
-                            .orElse(0.0);
-                } else {
+                if (!vectorRepository.hasEmbedding(article.getId())) {
                     String textForEmbedding = article.getTitle() + "\n" + truncate(article.getRawContent(), 1200);
                     float[] vector = geminiClient.embedText(textForEmbedding);
                     vectorRepository.updateEmbedding(article.getId(), vector);
-
-                    maxSim = vectorRepository
-                            .findMaxSimilarityInLast48Hours(article.getId(), vector)
-                            .orElse(0.0);
                 }
+                maxSim = vectorRepository.findMaxSimilarityByExistingEmbedding(article.getId()).orElse(0.0);
 
                 if (maxSim >= SIMILARITY_THRESHOLD) {
                     article.setStatus(ArticleStatus.DUPLICATE);
